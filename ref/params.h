@@ -1,1 +1,1 @@
-params/params-sphincs-shake256-256s.h
+params/params-sphincs-sha256-192-h35-w256.h
