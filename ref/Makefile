@@ -10,8 +10,6 @@ DET_HEADERS = $(HEADERS:randombytes.%=rng.%)
 TESTS = test/wots \
 	test/fors \
 	test/spx \
-	test/slim_verifier \
-
 
 .PHONY: clean test benchmark
 
@@ -31,8 +29,11 @@ test/%: test/%.c $(SOURCES) $(HEADERS)
 test/%.exec: test/%
 	@$<
 
-slim_verifier: test/slim_verifier test/slim_verifier.exec
+slim_verifier: test/spx_sig_infile test/slim_verifier 
+	@$< sig_file
+	
 
 clean:
 	-$(RM) $(TESTS)
 	-$(RM) test/benchmark
+	-$(RM) test/spx_sig_infile test/slim_verifier test/sig_file 
