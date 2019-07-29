@@ -6,10 +6,40 @@
 #include "../params.h"
 #include "../randombytes.h"
 
-#define SPX_MLEN 32
-#define SPX_SIGNATURES 1
+#define MAX_MSG_SIZE 32 // We only sign 256-bit hashes for image signing 
+#define MAX_PK_SIZE 64 /* SPHINCS+ PK size for SPHINCS+ image 
+			signing parameters can be 48 or 64 bytes. */
+#define MAX_SIG_SIZE 25000 /* SPHINCS+ Signature size for SPHINCS+
+			image signing parameters can't be > 25KB */
 
-int main()
+//TODO: Delete this, we don't need it. 
+#define SPX_MLEN 32 // We only sign 256-bit hashes for image signing
+
+
+
+static int read_file( const char *filename, void *mem, unsigned max_len,
+                      unsigned long long *len ) {
+    *len = 0;
+    FILE *f = fopen( filename, "r" );
+    if (!f) {
+        fprintf( stderr, "Unable to open file %s for reading.\n", filename );
+        return 0;
+    }
+
+    //printf("Reading from file %s... ", filename);
+    unsigned num_byte = fread(mem, 1, max_len, f);
+    fclose(f);
+    if (num_byte <= 0 || num_byte > max_len) {
+        fprintf( stderr, "Error reading %d,%d  bytes from file %s \n", (int)num_byte, (int)max_len, filename);
+        return 0;
+    }
+
+    *len = num_byte;
+    //printf("Successful.\n");
+    return 1;
+}
+
+int main(int argc, char **argv)
 {
     int ret = 0;
     int i;
@@ -17,15 +47,12 @@ int main()
     /* Make stdout buffer more responsive. */
     setbuf(stdout, NULL);
 
-    unsigned char pk[SPX_PK_BYTES];
-    unsigned char sk[SPX_SK_BYTES];
-    unsigned char *m = malloc(SPX_MLEN);
-    unsigned char *sm = malloc(SPX_BYTES + SPX_MLEN);
-    unsigned char *mout = malloc(SPX_BYTES + SPX_MLEN);
-    unsigned long long smlen;
-    unsigned long long mlen;
+    if (argc != 4 ) {
+        fprintf( stderr, "Usage: %s [msg file] [pk file] [sig file]\n", argv[0] );
+        return -1;
+    }
 
-    randombytes(m, SPX_MLEN);
+/*    randombytes(m, SPX_MLEN);
 
     printf("Generating keypair.. ");
 
@@ -35,9 +62,6 @@ int main()
     }
     printf("successful.\n");
 
-    printf("Testing %d signatures.. \n", SPX_SIGNATURES);
-
-    for (i = 0; i < SPX_SIGNATURES; i++) {
         printf("  - iteration #%d:\n", i);
 
         crypto_sign(sm, &smlen, m, SPX_MLEN, sk);
@@ -50,16 +74,38 @@ int main()
         else {
             printf("    smlen as expected [%llu].\n", smlen);
         }
+*/
 
-        /* Test if signature is valid. */
-        if (crypto_sign_open(mout, &mlen, sm, smlen, pk)) {
-            printf("  X verification failed!\n");
-            ret = -1;
-        }
-        else {
-            printf("    verification succeeded.\n");
-        }
+//TODO: Remove pk, amd mout since they are probably not necessary.
+    unsigned char sk[SPX_SK_BYTES];
+    unsigned char pk[MAX_PK_SIZE];
+    unsigned char m[MAX_MSG_SIZE];
+    unsigned char sm[MAX_SIG_SIZE]; 
+    unsigned char *mout = malloc(SPX_BYTES + SPX_MLEN);
+    unsigned long long smlen; 
+    unsigned long long mlen;
+    unsigned long long pklen; 
+    /* Test if signature is valid. */
+    // Read message from file 
+//TODO: Catch return code from read
+    read_file(argv[1], m, MAX_MSG_SIZE, &mlen); 
+    // Read public key from file. 
+//TODO: Catch return code from read
+    read_file(argv[2], pk, MAX_PK_SIZE, &pklen); 
+//printf("****** Read1: %20x\n", sm);
+    // Read signature from file. 
+//TODO: Catch return code from read
+    read_file(argv[3], sm, MAX_SIG_SIZE, &smlen); 
+    // Verify signature 
+    if (crypto_sign_open(mout, &mlen, sm, smlen, pk)) {
+        printf("  X verification failed!\n");
+        ret = -1;
+    }
+    else {
+        printf("    verification succeeded.\n");
+    }
 
+//TODO: Don't assume you know SPX_MLEN in order to check it. 
         /* Test if the correct message was recovered. */
         if (mlen != SPX_MLEN) {
             printf("  X mlen incorrect [%llu != %u]!\n", mlen, SPX_MLEN);
@@ -85,6 +131,7 @@ int main()
             printf("    in-place verification succeeded.\n");
         }
 
+//TODO: Don't test flipping bits in message, the verifier should do that. 
         /* Test if flipping bits invalidates the signature (it should). */
 
         /* Flip the first bit of the message. Should invalidate. */
@@ -98,6 +145,7 @@ int main()
         }
         sm[smlen - 1] ^= 1;
 
+//TODO: Don't test flipping bits in signature the verifier should do that. 
 #ifdef SPX_TEST_INVALIDSIG
         int j;
         /* Flip one bit per hash; the signature is entirely hashes. */
@@ -115,10 +163,7 @@ int main()
             printf("    changing any signature hash invalidates signature.\n");
         }
 #endif
-    }
 
-    free(m);
-    free(sm);
     free(mout);
 
     return ret;

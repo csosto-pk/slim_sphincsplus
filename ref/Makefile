@@ -29,11 +29,21 @@ test/%: test/%.c $(SOURCES) $(HEADERS)
 test/%.exec: test/%
 	@$<
 
-slim_verifier: test/spx_sig_infile test/slim_verifier 
-	@$< sig_file
-	
+
+
+SIG_FILES = test/spx_msg test/spx_pk test/spx_sig 
+
+test/spx_sig2file.exec: test/spx_sig2file
+	touch ${SIG_FILES}
+	@$< ${SIG_FILES} 
+
+test/slim_verifier.exec: test/slim_verifier
+	@$< ${SIG_FILES} 
+
+test/slim_sign-ver: test/spx_sig2file.exec test/slim_verifier.exec 
 
 clean:
 	-$(RM) $(TESTS)
 	-$(RM) test/benchmark
-	-$(RM) test/spx_sig_infile test/slim_verifier test/sig_file 
+	-$(RM) test/spx_sig2file test/slim_verifier ${SIG_FILES} 
+
