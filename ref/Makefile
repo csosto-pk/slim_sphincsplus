@@ -11,7 +11,7 @@ TESTS = test/wots \
 	test/fors \
 	test/spx \
 
-.PHONY: clean test benchmark
+.PHONY: clean test benchmark sig-ver test/spx_ver-from-file.exec test/spx_sig-to-file.exec
 
 default: benchmark
 
@@ -31,19 +31,19 @@ test/%.exec: test/%
 
 
 
-SIG_FILES = test/spx_msg test/spx_pk test/spx_sig 
+SIG_FILES = test/spx_msg~ test/spx_pk~ test/spx_sig~ 
 
-test/spx_sig2file.exec: test/spx_sig2file
+test/spx_sig-to-file.exec: test/spx_sig-to-file
 	touch ${SIG_FILES}
 	@$< ${SIG_FILES} 
 
-test/slim_verifier.exec: test/slim_verifier
+test/spx_ver-from-file.exec: test/spx_ver-from-file
 	@$< ${SIG_FILES} 
 
-test/slim_sign-ver: test/spx_sig2file.exec test/slim_verifier.exec 
+test/sig-ver: test/spx_sig-to-file.exec test/spx_ver-from-file.exec 
 
 clean:
 	-$(RM) $(TESTS)
 	-$(RM) test/benchmark
-	-$(RM) test/spx_sig2file test/slim_verifier ${SIG_FILES} 
+	-$(RM) test/spx_sig-to-file test/spx_ver-from-file ${SIG_FILES} 
 
