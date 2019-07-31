@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     else 
        return -1; 
 
-    printf("Generating keypair... \n     and writing to file...");
+    printf("Generating keypair... \n     and writing to file... ");
     if (crypto_sign_keypair(pk, sk)) {
         printf("failed!\n");
         return -1;

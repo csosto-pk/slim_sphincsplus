@@ -65,6 +65,7 @@ int main(int argc, char **argv)
     unsigned long long pklen; 
     /* Test if signature is valid. */
     // Read message from file 
+    printf("Loading message, public key and signature from files... ");
     if (read_file(argv[1], m, MAX_MSG_SIZE, &mlen)==-1) 
        return -1; 
     // Read public key from file. 
@@ -72,31 +73,36 @@ int main(int argc, char **argv)
        return -1; 
     // Read signature from file. 
     if (read_file(argv[3], sm, MAX_SIG_SIZE, &smlen)==-1) 
-       return -1; 
+       return -1;
+    printf("Successful.\n");
+
     // Verify signature in-place.
 #ifdef TEST_MSG_RECOVERY
         // Store the signed message to check message recovery below.
         memcpy(mout, sm, MAX_MSG_SIZE);
 #endif
+#ifndef TEST_MSG_RECOVERY
     if (crypto_sign_open(sm, &mlen, sm, smlen, pk)) {
-        printf("   In-place verification failed!\n");
+        printf("In-place verification failed!\n");
     }
     else {
-        printf("   In-place verification succeeded.\n");
+        printf("In-place verification succeeded.\n");
     }
+#endif
 
 #ifdef TEST_MSG_RECOVERY
     /* Restore the signed message */
     memcpy(sm, mout, MAX_MSG_SIZE);
-    // And verify the signature and recover the message.
+    // And verify again the signature and recover the message.
     if (crypto_sign_open(mout, &mlen, sm, smlen, pk)) {
-       printf("   Verification failed!\n");
+       printf("Verification failed!\n");
     }
     else {
-       if (memcmp(m, mout, MAX_MSG_SIZE))
-          printf("   Output message retrieved from signature correctly. \n");
+       printf("Verification succeeded. \n");
+       if (memcmp(m, mout, MAX_MSG_SIZE)) 
+          printf("   But output message retrieved from signature incorrectly! \n");
        else 
-          printf("   Output message retrieved from signature incorrectly! \n");
+          printf("   And output message retrieved from signature correctly. \n");
     }
 #endif
 

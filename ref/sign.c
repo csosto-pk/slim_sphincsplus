@@ -16,6 +16,7 @@
  * Computes the leaf at a given address. First generates the WOTS key pair,
  * then computes leaf by hashing horizontally.
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 static void wots_gen_leaf(unsigned char *leaf, const unsigned char *sk_seed,
                           const unsigned char *pub_seed,
                           uint32_t addr_idx, const uint32_t tree_addr[8])
@@ -186,6 +187,7 @@ int crypto_sign_signature(uint8_t *sig, size_t *siglen,
 
     return 0;
 }
+#endif
 
 /**
  * Verifies a detached signature and message under a given public key.
@@ -271,6 +273,7 @@ int crypto_sign_verify(const uint8_t *sig, size_t siglen,
 /**
  * Returns an array containing the signature followed by the message.
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 int crypto_sign(unsigned char *sm, unsigned long long *smlen,
                 const unsigned char *m, unsigned long long mlen,
                 const unsigned char *sk)
@@ -284,6 +287,7 @@ int crypto_sign(unsigned char *sm, unsigned long long *smlen,
 
     return 0;
 }
+#endif
 
 /**
  * Verifies a given signature-message pair under a given public key.
@@ -313,3 +317,4 @@ int crypto_sign_open(unsigned char *m, unsigned long long *mlen,
 
     return 0;
 }
+
