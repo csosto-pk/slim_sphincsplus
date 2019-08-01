@@ -16,7 +16,7 @@
  * Computes the leaf at a given address. First generates the WOTS key pair,
  * then computes leaf by hashing horizontally.
  */
-#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
 static void wots_gen_leaf(unsigned char *leaf, const unsigned char *sk_seed,
                           const unsigned char *pub_seed,
                           uint32_t addr_idx, const uint32_t tree_addr[8])

@@ -8,11 +8,13 @@
 #include "thash.h"
 #include "address.h"
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
 static void fors_gen_sk(unsigned char *sk, const unsigned char *sk_seed,
                         uint32_t fors_leaf_addr[8])
 {
     prf_addr(sk, sk_seed, fors_leaf_addr);
 }
+#endif
 
 static void fors_sk_to_leaf(unsigned char *leaf, const unsigned char *sk,
                             const unsigned char *pub_seed,
@@ -21,6 +23,7 @@ static void fors_sk_to_leaf(unsigned char *leaf, const unsigned char *sk,
     thash(leaf, sk, 1, pub_seed, fors_leaf_addr);
 }
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 static void fors_gen_leaf(unsigned char *leaf, const unsigned char *sk_seed,
                           const unsigned char *pub_seed,
                           uint32_t addr_idx, const uint32_t fors_tree_addr[8])
@@ -35,6 +38,7 @@ static void fors_gen_leaf(unsigned char *leaf, const unsigned char *sk_seed,
     fors_gen_sk(leaf, sk_seed, fors_leaf_addr);
     fors_sk_to_leaf(leaf, leaf, pub_seed, fors_leaf_addr);
 }
+#endif
 
 /**
  * Interprets m as SPX_FORS_HEIGHT-bit unsigned integers.
@@ -59,6 +63,7 @@ static void message_to_indices(uint32_t *indices, const unsigned char *m)
  * Signs a message m, deriving the secret key from sk_seed and the FTS address.
  * Assumes m contains at least SPX_FORS_HEIGHT * SPX_FORS_TREES bits.
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void fors_sign(unsigned char *sig, unsigned char *pk,
                const unsigned char *m,
                const unsigned char *sk_seed, const unsigned char *pub_seed,
@@ -99,6 +104,7 @@ void fors_sign(unsigned char *sig, unsigned char *pk,
     /* Hash horizontally across all tree roots to derive the public key. */
     thash(pk, roots, SPX_FORS_TREES, pub_seed, fors_pk_addr);
 }
+#endif
 
 /**
  * Derives the FORS public key from a signature.

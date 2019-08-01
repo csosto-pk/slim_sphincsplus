@@ -16,6 +16,7 @@
  * Computes the starting value for a chain, i.e. the secret key.
  * Expects the address to be complete up to the chain address.
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
 static void wots_gen_sk(unsigned char *sk, const unsigned char *sk_seed,
                         uint32_t wots_addr[8])
 {
@@ -25,6 +26,7 @@ static void wots_gen_sk(unsigned char *sk, const unsigned char *sk_seed,
     /* Generate sk element. */
     prf_addr(sk, sk_seed, wots_addr);
 }
+#endif
 
 /**
  * Computes the chaining function.
@@ -108,7 +110,7 @@ static void chain_lengths(int *lengths, const unsigned char *msg)
  *
  * Writes the computed public key to 'pk'.
  */
-
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
 void wots_gen_pk(unsigned char *pk, const unsigned char *sk_seed,
                  const unsigned char *pub_seed, uint32_t addr[8])
 {
@@ -125,7 +127,6 @@ void wots_gen_pk(unsigned char *pk, const unsigned char *sk_seed,
 /**
  * Takes a n-byte message and the 32-byte sk_see to compute a signature 'sig'.
  */
-#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void wots_sign(unsigned char *sig, const unsigned char *msg,
                const unsigned char *sk_seed, const unsigned char *pub_seed,
                uint32_t addr[8])

@@ -94,6 +94,7 @@ void compute_root(unsigned char *root, const unsigned char *leaf,
  * Applies the offset idx_offset to indices before building addresses, so that
  * it is possible to continue counting indices across trees.
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void treehash(unsigned char *root, unsigned char *auth_path,
               const unsigned char *sk_seed, const unsigned char *pub_seed,
               uint32_t leaf_idx, uint32_t idx_offset, uint32_t tree_height,
@@ -147,3 +148,4 @@ void treehash(unsigned char *root, unsigned char *auth_path,
     }
     memcpy(root, stack, SPX_N);
 }
+#endif

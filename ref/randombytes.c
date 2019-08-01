@@ -5,6 +5,7 @@ This code was taken from the SPHINCS reference implementation and is public doma
 #include <fcntl.h>
 #include <unistd.h>
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 static int fd = -1;
 
 void randombytes(unsigned char *x, unsigned long long xlen)
@@ -39,3 +40,4 @@ void randombytes(unsigned char *x, unsigned long long xlen)
         xlen -= i;
     }
 }
+#endif

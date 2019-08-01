@@ -93,6 +93,7 @@ static void store_bigendian_64(uint8_t *x, uint64_t u) {
     b = a;                                           \
     a = T1 + T2;
 
+
 static size_t crypto_hashblocks_sha256(uint8_t *statebytes,
                                        const uint8_t *in, size_t inlen) {
     uint32_t state[8];
