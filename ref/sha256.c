@@ -323,11 +323,17 @@ void sha256_inc_finalize(uint8_t *out, uint8_t *state, const uint8_t *in, size_t
 }
 
 void sha256(uint8_t *out, const uint8_t *in, size_t inlen) {
+#ifdef USE_OPENSSL_SHA256 // If you don't want to use an external library's SHA256 implementation
+    SHA256(in,inlen,out);
+#else
     uint8_t state[40];
 
     sha256_inc_init(state);
     sha256_inc_finalize(out, state, in, inlen);
+#endif
+
 }
+
 
 /*
  * Compresses an address to a 22-byte sequence.
@@ -393,3 +399,4 @@ void seed_state(const unsigned char *pub_seed) {
     sha256_inc_init(state_seeded);
     sha256_inc_blocks(state_seeded, block, 1);
 }
+

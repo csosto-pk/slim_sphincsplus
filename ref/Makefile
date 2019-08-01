@@ -35,9 +35,13 @@ test/spx_sig-to-file.exec: test/spx_sig-to-file
 	@$< ${SIG_FILES} 
 
 test/spx_slim-ver-from-file: test/spx_slim-ver-from-file.c $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) -DBUILD_SLIM_VERIFIER -o $@ $(SOURCES) $< $(LDLIBS)
+	$(CC) $(CFLAGS) -o test/spx_bloated_ver-from-file $(SOURCES) $< $(LDLIBS) 
+	$(CC) $(CFLAGS) -DBUILD_SLIM_VERIFIER -o test/spx_ver-from-file $(SOURCES) $< $(LDLIBS) 
+	$(CC) $(CFLAGS) -DBUILD_SLIM_VERIFIER -DUSE_OPENSSL_SHA256 -o $@ $(SOURCES) -lcrypto $< $(LDLIBS) 
 
 test/spx_slim-ver-from-file.exec: test/spx_slim-ver-from-file
+	test/spx_bloated_ver-from-file ${SIG_FILES} 
+	test/spx_ver-from-file ${SIG_FILES} 
 	@$< ${SIG_FILES} 
 
 test/sig-ver: test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec 
@@ -45,5 +49,5 @@ test/sig-ver: test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec
 clean:
 	-$(RM) $(TESTS)
 	-$(RM) test/benchmark
-	-$(RM) test/spx_sig-to-file test/spx_slim-ver-from-file ${SIG_FILES} 
+	-$(RM) test/spx_sig-to-file test/spx_*-from-file ${SIG_FILES} 
 
