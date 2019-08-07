@@ -11,6 +11,7 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 AES256_CTR_DRBG_struct  DRBG_ctx;
 
 void    AES256_ECB(unsigned char *key, unsigned char *ctr, unsigned char *buffer);
@@ -211,7 +212,7 @@ AES256_CTR_DRBG_Update(unsigned char *provided_data,
     memcpy(Key, temp, 32);
     memcpy(V, temp+32, 16);
 }
-
+#endif
 
 
 

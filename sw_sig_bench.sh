@@ -6,62 +6,50 @@ cd ref
 
 rm params.h 
 ln -s params/params-sphincs-sha256-192-h15-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-192-h15-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-192-h20-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-192-h20-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-192-h35-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h
 ln -s params/params-sphincs-sha256-192-h35-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h15-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h15-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h20-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h20-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h35-w16.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 rm params.h 
 ln -s params/params-sphincs-sha256-256-h35-w256.h params.h 
-make clean
-make benchmark
+make clean && make test/sig-ver && make benchmark
 
 cd test 

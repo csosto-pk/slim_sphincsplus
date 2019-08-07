@@ -19,6 +19,7 @@ void initialize_hash_function(const unsigned char *pub_seed,
 /*
  * Computes PRF(key, addr), given a secret key of SPX_N bytes and an address
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void prf_addr(unsigned char *out, const unsigned char *key,
               const uint32_t addr[8])
 {
@@ -31,6 +32,7 @@ void prf_addr(unsigned char *out, const unsigned char *key,
     sha256(outbuf, buf, SPX_N + SPX_SHA256_ADDR_BYTES);
     memcpy(out, outbuf, SPX_N);
 }
+#endif
 
 /**
  * Computes the message-dependent randomness R, using a secret seed as a key
@@ -40,6 +42,7 @@ void prf_addr(unsigned char *out, const unsigned char *key,
  * prefix. This is necessary to prevent having to move the message around (and
  * allocate memory for it).
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
                         const unsigned char *optrand,
                         const unsigned char *m, unsigned long long mlen)
@@ -87,6 +90,7 @@ void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
     sha256(buf, buf, SPX_SHA256_BLOCK_BYTES + SPX_SHA256_OUTPUT_BYTES);
     memcpy(R, buf, SPX_N);
 }
+#endif
 
 /**
  * Computes the message hash using R, the public key, and the message.

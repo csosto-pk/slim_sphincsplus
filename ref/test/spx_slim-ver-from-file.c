@@ -12,7 +12,7 @@
 #define MAX_SIG_SIZE 25000 /* SPHINCS+ Signature size for SPHINCS+
 			image signing parameters can't be > 25KB */
 
-#define TEST_MSG_RECOVERY // Only if we want to check the recovered 
+//#define TEST_MSG_RECOVERY // Only if we want to check the recovered 
 			// is the same as the one stored in the file.
 
 

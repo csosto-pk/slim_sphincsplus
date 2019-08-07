@@ -3,6 +3,7 @@
 #include "params.h"
 #include "utils.h"
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void addr_to_bytes(unsigned char *bytes, const uint32_t addr[8])
 {
     int i;
@@ -11,6 +12,7 @@ void addr_to_bytes(unsigned char *bytes, const uint32_t addr[8])
         ull_to_bytes(bytes + i*4, 4, addr[i]);
     }
 }
+#endif
 
 void set_layer_addr(uint32_t addr[8], uint32_t layer)
 {
@@ -39,6 +41,7 @@ void copy_subtree_addr(uint32_t out[8], const uint32_t in[8])
     out[2] = in[2];
     out[3] = in[3];
 }
+
 
 /* These functions are used for OTS addresses. */
 
@@ -77,3 +80,4 @@ void set_tree_index(uint32_t addr[8], uint32_t tree_index)
 {
     addr[7] = tree_index;
 }
+
