@@ -28,6 +28,12 @@ test/%.exec: test/%
 
 
 
+test/benchmark.exec2: test/benchmarkwopenssl 
+	@$<
+
+test/benchmarkwopenssl: test/benchmark.c $(SOURCES) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ $(SOURCES) -DUSE_OPENSSL_SHA256 -lcrypto $< $(LDLIBS)
+
 SIG_FILES = test/spx_msg~ test/spx_pk~ test/spx_sig~ 
 
 test/spx_sig-to-file.exec: test/spx_sig-to-file
@@ -48,6 +54,6 @@ test/sig-ver: test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec
 
 clean:
 	-$(RM) $(TESTS)
-	-$(RM) test/benchmark
+	-$(RM) test/benchmark test/benchmarkwopenssl
 	-$(RM) test/spx_sig-to-file test/spx_*-from-file ${SIG_FILES} 
 

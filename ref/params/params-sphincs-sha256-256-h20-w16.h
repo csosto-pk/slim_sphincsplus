@@ -7,7 +7,7 @@
 /* Height of the hypertree. */
 #define SPX_FULL_HEIGHT 20
 /* Number of subtree layer. */
-#define SPX_D 2
+#define SPX_D 4
 /* FORS tree dimensions. */
 #define SPX_FORS_HEIGHT 16 
 #define SPX_FORS_TREES 19
