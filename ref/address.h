@@ -9,7 +9,10 @@
 #define SPX_ADDR_TYPE_FORSTREE 3
 #define SPX_ADDR_TYPE_FORSPK 4
 
+
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 void addr_to_bytes(unsigned char *bytes, const uint32_t addr[8]);
+#endif
 
 void set_layer_addr(uint32_t addr[8], uint32_t layer);
 

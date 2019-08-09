@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "params.h"
 
+
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 /**
  * WOTS key generation. Takes a 32 byte seed for the private key, expands it to
  * a full WOTS private key and computes the corresponding public key.
@@ -22,6 +24,7 @@ void wots_gen_pk(unsigned char *pk, const unsigned char *seed,
 void wots_sign(unsigned char *sig, const unsigned char *msg,
                const unsigned char *seed, const unsigned char *pub_seed,
                uint32_t addr[8]);
+#endif
 
 /**
  * Takes a WOTS signature and an n-byte message, computes a WOTS public key.

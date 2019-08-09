@@ -16,6 +16,7 @@ static void fors_gen_sk(unsigned char *sk, const unsigned char *sk_seed,
 }
 #endif
 
+
 static void fors_sk_to_leaf(unsigned char *leaf, const unsigned char *sk,
                             const unsigned char *pub_seed,
                             uint32_t fors_leaf_addr[8])

@@ -5,6 +5,7 @@
 
 #include "params.h"
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 /**
  * Signs a message m, deriving the secret key from sk_seed and the FTS address.
  * Assumes m contains at least SPX_FORS_HEIGHT * SPX_FORS_TREES bits.
@@ -13,6 +14,7 @@ void fors_sign(unsigned char *sig, unsigned char *pk,
                const unsigned char *m,
                const unsigned char *sk_seed, const unsigned char *pub_seed,
                const uint32_t fors_addr[8]);
+#endif
 
 /**
  * Derives the FORS public key from a signature.
@@ -25,5 +27,6 @@ void fors_pk_from_sig(unsigned char *pk,
                       const unsigned char *sig, const unsigned char *m,
                       const unsigned char *pub_seed,
                       const uint32_t fors_addr[8]);
+
 
 #endif

@@ -2,9 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../api.h"
 #include "../params.h"
-#include "../randombytes.h"
 
 #define MAX_MSG_SIZE 32 // We only sign 256-bit hashes for image signing 
 #define MAX_PK_SIZE 64 /* SPHINCS+ PK size for SPHINCS+ image 
