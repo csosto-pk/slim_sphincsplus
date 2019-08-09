@@ -76,24 +76,8 @@ int main(int argc, char **argv)
        return -1;
     printf("Successful.\n");
 
-    // Verify signature in-place.
 #ifdef TEST_MSG_RECOVERY
-        // Store the signed message to check message recovery below.
-        memcpy(mout, sm, MAX_MSG_SIZE);
-#endif
-#ifndef TEST_MSG_RECOVERY
-    if (crypto_sign_open(sm, &mlen, sm, smlen, pk)) {
-        printf("In-place verification failed!\n");
-    }
-    else {
-        printf("In-place verification succeeded.\n");
-    }
-#endif
-
-#ifdef TEST_MSG_RECOVERY
-    /* Restore the signed message */
-    memcpy(sm, mout, MAX_MSG_SIZE);
-    // And verify again the signature and recover the message.
+    // Verify the signature and recover the message.
     if (crypto_sign_open(mout, &mlen, sm, smlen, pk)) {
        printf("Verification failed!\n");
     }
@@ -104,10 +88,15 @@ int main(int argc, char **argv)
        else 
           printf("   And output message retrieved from signature correctly. \n");
     }
-#endif
-
-#ifdef TEST_MSG_RECOVERY
     free(mout);
+#elif TEST_MSG_RECOVERY
+    // Verify signature in-place.
+    if (crypto_sign_open(sm, &mlen, sm, smlen, pk)) {
+        printf("In-place verification failed!\n");
+    }
+    else {
+        printf("In-place verification succeeded.\n");
+    }
 #endif
 
     return 0;
