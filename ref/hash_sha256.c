@@ -42,7 +42,8 @@ void prf_addr(unsigned char *out, const unsigned char *key,
  * prefix. This is necessary to prevent having to move the message around (and
  * allocate memory for it).
  */
-#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
+
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim   
 void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
                         const unsigned char *optrand,
                         const unsigned char *m, unsigned long long mlen)
@@ -119,9 +120,14 @@ void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
 
     unsigned char buf[SPX_DGST_BYTES];
     unsigned char *bufp = buf;
-    uint8_t state[40];
 
+#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+    SHA256_CTX sha2ctx;
+    SHA256_Init(&sha2ctx);
+#else // Or if code size is not a concern use the old SPHINCS+ 
+    uint8_t state[40];
     sha256_inc_init(state);
+#endif 
 
     memcpy(inbuf, R, SPX_N);
     memcpy(inbuf + SPX_N, pk, SPX_PK_BYTES);
@@ -129,17 +135,30 @@ void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
     /* If R + pk + message cannot fill up an entire block */
     if (SPX_N + SPX_PK_BYTES + mlen < SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES) {
         memcpy(inbuf + SPX_N + SPX_PK_BYTES, m, mlen);
+#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+        SHA256_Update(&sha2ctx, inbuf, SPX_N + SPX_PK_BYTES + mlen);
+        SHA256_Final(seed, &sha2ctx);
+#else // Or if code size is not a concern use the old SPHINCS+ 
         sha256_inc_finalize(seed, state, inbuf, SPX_N + SPX_PK_BYTES + mlen);
+#endif 
     }
     /* Otherwise first fill a block, so that finalize only uses the message */
     else {
         memcpy(inbuf + SPX_N + SPX_PK_BYTES, m,
                SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES);
+#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+        SHA256_Update(&sha2ctx, inbuf, 64*SPX_INBLOCKS);
+#else // Or if code size is not a concern use the old SPHINCS+ 
         sha256_inc_blocks(state, inbuf, SPX_INBLOCKS);
+#endif 
 
         m += SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
         mlen -= SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
+#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+
+#else // Or if code size is not a concern use the old SPHINCS+ 
         sha256_inc_finalize(seed, state, m, mlen);
+#endif 
     }
 
     /* By doing this in two steps, we prevent hashing the message twice;

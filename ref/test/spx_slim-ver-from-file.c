@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "../api.h"
 #include "../params.h"
 
 #define MAX_MSG_SIZE 32 // We only sign 256-bit hashes for image signing 
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
           printf("   And output message retrieved from signature correctly. \n");
     }
     free(mout);
-#elif TEST_MSG_RECOVERY
+#else
     // Verify signature in-place.
     if (crypto_sign_open(sm, &mlen, sm, smlen, pk)) {
         printf("In-place verification failed!\n");

@@ -1,11 +1,11 @@
 CC = /usr/bin/gcc
 CFLAGS = -Wall -Os 
 
-SOURCES = address.c wots.c utils.c fors.c sign.c hash_sha256.c thash_sha256_simple.c sha256.c
-HEADERS = params.h address.h randombytes.h wots.h utils.h fors.h api.h hash.h thash.h sha256.h
+SOURCES = randombytes.c address.c wots.c utils.c fors.c sign.c hash_sha256.c thash_sha256_simple.c sha256.c
+HEADERS = randombytes.h params.h address.h wots.h utils.h fors.h api.h hash.h thash.h sha256.h
 
 SLIM_SOURCES = address.c wots.c utils.c fors.c sign.c hash_sha256.c thash_sha256_simple.c sha256.c
-SLIM_HEADERS = params.h address.h wots.h utils.h fors.h hash.h thash.h sha256.h
+SLIM_HEADERS = params.h address.h wots.h utils.h fors.h api.h hash.h thash.h sha256.h
 
 TESTS = test/wots \
 	test/fors \
