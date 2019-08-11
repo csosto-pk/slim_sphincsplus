@@ -107,9 +107,9 @@ int main(int argc, char **argv)
 #ifdef DEBUG
     /* Only for debugging. Test if signature is valid. */
     if (crypto_sign_open(mout, &mlen, sm, smlen, pk)) {
-        printf("Verification failed!\n");
+        printf("Tried to verify signature. Verification failed!\n");
 #ifdef SPX_TEST_INVALIDSIG
-        printf("    We intentionally generated an invalid signature.\n");
+        printf("    (We intentionally generated an invalid signature.)\n");
 #endif
     }
     else {

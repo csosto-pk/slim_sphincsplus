@@ -228,7 +228,6 @@ int crypto_sign_verify(const uint8_t *sig, size_t siglen,
     /* Layer correctly defaults to 0, so no need to set_layer_addr */
     set_tree_addr(wots_addr, tree);
     set_keypair_addr(wots_addr, idx_leaf);
-
     fors_pk_from_sig(root, sig, mhash, pub_seed, wots_addr);
     sig += SPX_FORS_BYTES;
 
@@ -305,12 +304,12 @@ int crypto_sign_open(unsigned char *m, unsigned long long *mlen,
     }
 
     *mlen = smlen - SPX_BYTES;
-
     if (crypto_sign_verify(sm, SPX_BYTES, sm + SPX_BYTES, (size_t)*mlen, pk)) {
         memset(m, 0, smlen);
         *mlen = 0;
         return -1;
     }
+
 
     /* If verification was successful, move the message to the right place. */
     memmove(m, sm + SPX_BYTES, *mlen);

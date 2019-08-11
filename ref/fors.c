@@ -16,6 +16,7 @@ static void fors_gen_sk(unsigned char *sk, const unsigned char *sk_seed,
 }
 #endif
 
+
 static void fors_sk_to_leaf(unsigned char *leaf, const unsigned char *sk,
                             const unsigned char *pub_seed,
                             uint32_t fors_leaf_addr[8])
@@ -133,13 +134,11 @@ void fors_pk_from_sig(unsigned char *pk,
     set_type(fors_pk_addr, SPX_ADDR_TYPE_FORSPK);
 
     message_to_indices(indices, m);
-
     for (i = 0; i < SPX_FORS_TREES; i++) {
         idx_offset = i * (1 << SPX_FORS_HEIGHT);
 
         set_tree_height(fors_tree_addr, 0);
         set_tree_index(fors_tree_addr, indices[i] + idx_offset);
-
         /* Derive the leaf from the included secret key part. */
         fors_sk_to_leaf(leaf, sig, pub_seed, fors_tree_addr);
         sig += SPX_N;
@@ -149,7 +148,6 @@ void fors_pk_from_sig(unsigned char *pk,
                      sig, SPX_FORS_HEIGHT, pub_seed, fors_tree_addr);
         sig += SPX_N * SPX_FORS_HEIGHT;
     }
-
     /* Hash horizontally across all tree roots to derive the public key. */
     thash(pk, roots, SPX_FORS_TREES, pub_seed, fors_pk_addr);
 }
