@@ -581,6 +581,12 @@ void mgf1(unsigned char *out, unsigned long outlen,
     }
 }
 
+#ifdef BUILD_SLIM_VERIFIER 
+SHA256_CTX sha2ctx_seeded; 
+#else 
+uint8_t state_seeded[40];
+#endif // #ifdef BUILD_SLIM_VERIFIER
+
 
 /**
  * Absorb the constant pub_seed using one round of the compression function

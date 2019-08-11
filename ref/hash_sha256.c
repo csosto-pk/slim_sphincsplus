@@ -155,7 +155,8 @@ void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
         m += SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
         mlen -= SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
 #ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
-
+        SHA256_Update(&sha2ctx, m, mlen);
+        SHA256_Final(seed, &sha2ctx);
 #else // Or if code size is not a concern use the old SPHINCS+ 
         sha256_inc_finalize(seed, state, m, mlen);
 #endif 

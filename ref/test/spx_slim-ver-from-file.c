@@ -91,10 +91,10 @@ int main(int argc, char **argv)
 #else
     // Verify signature in-place.
     if (crypto_sign_open(sm, &mlen, sm, smlen, pk)) {
-        printf("In-place verification failed!\n");
+        printf("   In-place verification failed!\n");
     }
     else {
-        printf("In-place verification succeeded.\n");
+        printf("   In-place verification succeeded.\n");
     }
 #endif
 

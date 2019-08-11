@@ -46,7 +46,6 @@ void compute_root(unsigned char *root, const unsigned char *leaf,
 {
     uint32_t i;
     unsigned char buffer[2 * SPX_N];
-
     /* If leaf_idx is odd (last bit = 1), current path element is a right child
        and auth_path has to go left. Otherwise it is the other way around. */
     if (leaf_idx & 1) {
