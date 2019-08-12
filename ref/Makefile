@@ -1,5 +1,5 @@
 CC = /usr/bin/gcc
-CFLAGS = -Wall -Os 
+CFLAGS = -Wall -Os -march=native -fomit-frame-pointer -flto
 
 SOURCES = randombytes.c address.c wots.c utils.c fors.c sign.c hash_sha256.c thash_sha256_simple.c sha256.c
 HEADERS = randombytes.h params.h address.h wots.h utils.h fors.h api.h hash.h thash.h sha256.h
