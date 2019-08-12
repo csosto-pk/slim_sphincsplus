@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "sha256.h"
 
-#ifndef BUILD_SLIM_VERIFIER // Or if code size is not a concern use the old SPHINCS+ 
+#if !defined(USE_OPENSSL_SHA256) && !defined(USE_OPENSSL_API_SHA256) // If using a SHA256 implementation from crypto_hash/sha512/ref/
 static uint32_t load_bigendian_32(const uint8_t *x) {
     return (uint32_t)(x[3]) | (((uint32_t)(x[2])) << 8) |
            (((uint32_t)(x[1])) << 16) | (((uint32_t)(x[0])) << 24);
@@ -323,22 +323,22 @@ void sha256_inc_finalize(uint8_t *out, uint8_t *state, const uint8_t *in, size_t
         out[i] = state[i];
     }
 }
-#endif //#ifndef BUILD_SLIM_VERIFIER 
+#endif //#if !defined(USE_OPENSSL_SHA256) && !defined(USE_OPENSSL_API_SHA256)
 
 void sha256(uint8_t *out, const uint8_t *in, size_t inlen) {
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
     SHA256((void *)in, (unsigned int)inlen, (unsigned char *)out);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
     uint8_t state[40];
     sha256_inc_init(state);
     sha256_inc_finalize(out, state, in, inlen);
-#endif // #ifdef BUILD_SLIM_VERIFIER
-
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 }
 
-#ifdef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
-#ifndef USE_OPENSSL_SHA256 // If not using OpenSSL for SHA256
-/* If we don't have OpenSSL, here's a SHA256 implementation a la OpenSSL */
+#ifdef USE_OPENSSL_API_SHA256 /* If using a local SHA256 implementation 
+with the same API as OpenSSL */
+/* If we don't have OpenSSL, here's a SHA256 implementation a la OpenSSL API */
 #define SHA256_FINALCOUNT_SIZE  8
 #define SHA256_K_SIZE	        64
 static const unsigned long K[SHA256_K_SIZE] = {
@@ -533,9 +533,7 @@ void SHA256(const void *image, unsigned int len, unsigned char *result) {
     SHA256_Update(&ctx, image, len);
     SHA256_Final(result, &ctx);
 }
-#endif // #ifndef USE_OPENSSL_SHA256 
-#endif //#ifdef BUILD_SLIM_VERIFIER 
-
+#endif // #ifdef USE_OPENSSL_API_SHA256 
 
 /*
  * Compresses an address to a 22-byte sequence.
@@ -581,12 +579,13 @@ void mgf1(unsigned char *out, unsigned long outlen,
     }
 }
 
-#ifdef BUILD_SLIM_VERIFIER 
-SHA256_CTX sha2ctx_seeded; 
-#else 
-uint8_t state_seeded[40];
-#endif // #ifdef BUILD_SLIM_VERIFIER
 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+SHA256_CTX sha2ctx_seeded; 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
+uint8_t state_seeded[40];
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 
 /**
  * Absorb the constant pub_seed using one round of the compression function
@@ -603,12 +602,13 @@ void seed_state(const unsigned char *pub_seed) {
         block[i] = 0;
     }
 
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
     SHA256_Init(&sha2ctx_seeded);
     SHA256_Update(&sha2ctx_seeded, block, 64);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
     sha256_inc_init(state_seeded);
     sha256_inc_blocks(state_seeded, block, 1);
-#endif 
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 }
 

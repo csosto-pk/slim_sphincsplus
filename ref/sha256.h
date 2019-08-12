@@ -13,13 +13,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim 
-
-#ifdef USE_OPENSSL_SHA256 // If you don't want to use an external library's SHA256 implementation
+#if defined(USE_OPENSSL_SHA256) // If you want to use the OpenSSL SHA256 implementation
 
 #include <openssl/sha.h>
+SHA256_CTX sha2ctx_seeded; 
 
-#else // Use local a la OpenSSL SHA256 implementation
+#elif defined(USE_OPENSSL_API_SHA256) /* If you want to use a local SHA256 implementation 
+with the same API as OpenSSL */
 
 /* SHA256 context. */
 typedef struct {
@@ -41,20 +41,21 @@ void SHA256_Final(unsigned char *,
 
 void SHA256(const void *image, unsigned int len, unsigned char *result);
 
-#endif // #ifdef USE_OPENSSL_SHA256
-
 SHA256_CTX sha2ctx_seeded; 
 
-#else 
+#else /* If you want to use a local SHA256 implementation from 
+ * crypto_hash/sha512/ref/ in http://bench.cr.yp.to/supercop.html
+ * by D. J. Bernstein */
 
 void sha256_inc_init(uint8_t *state);
 void sha256_inc_blocks(uint8_t *state, const uint8_t *in, size_t inblocks);
 void sha256_inc_finalize(uint8_t *out, uint8_t *state, const uint8_t *in, size_t inlen);
-void sha256(uint8_t *out, const uint8_t *in, size_t inlen);
 
 uint8_t state_seeded[40];
 
-#endif // #ifdef BUILD_SLIM_VERIFIER
+#endif // #ifdef USE_OPENSSL_SHA256
+
+void sha256(uint8_t *out, const uint8_t *in, size_t inlen);
 
 void compress_address(unsigned char *out, const uint32_t addr[8]);
 

@@ -16,7 +16,9 @@
 /*
  * Returns the length of a secret key, in bytes
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 unsigned long long crypto_sign_secretkeybytes(void);
+#endif
 
 /*
  * Returns the length of a public key, in bytes
@@ -26,6 +28,7 @@ unsigned long long crypto_sign_publickeybytes(void);
 /*
  * Returns the length of a signature, in bytes
  */
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim
 unsigned long long crypto_sign_bytes(void);
 
 /*
@@ -66,6 +69,7 @@ int crypto_sign_verify(const uint8_t *sig, size_t siglen,
 int crypto_sign(unsigned char *sm, unsigned long long *smlen,
                 const unsigned char *m, unsigned long long mlen,
                 const unsigned char *sk);
+#endif
 
 /**
  * Verifies a given signature-message pair under a given public key.

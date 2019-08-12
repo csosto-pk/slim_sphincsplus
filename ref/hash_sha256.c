@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "address.h"
@@ -49,7 +50,12 @@ void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
                         const unsigned char *m, unsigned long long mlen)
 {
     unsigned char buf[SPX_SHA256_BLOCK_BYTES + SPX_SHA256_OUTPUT_BYTES];
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+    SHA256_CTX sha2ctx;
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
     uint8_t state[40];
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     int i;
 
 #if SPX_N > SPX_SHA256_BLOCK_BYTES
@@ -62,25 +68,47 @@ void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
     }
     memset(buf + SPX_N, 0x36, SPX_SHA256_BLOCK_BYTES - SPX_N);
 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+    SHA256_Init(&sha2ctx);
+    SHA256_Update(&sha2ctx, buf, 64);
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
     sha256_inc_init(state);
     sha256_inc_blocks(state, buf, 1);
-
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     memcpy(buf, optrand, SPX_N);
 
     /* If optrand + message cannot fill up an entire block */
     if (SPX_N + mlen < SPX_SHA256_BLOCK_BYTES) {
         memcpy(buf + SPX_N, m, mlen);
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+        SHA256_Update(&sha2ctx, buf, mlen + SPX_N);
+        SHA256_Final(buf + SPX_SHA256_BLOCK_BYTES, &sha2ctx);
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_finalize(buf + SPX_SHA256_BLOCK_BYTES, state,
                             buf, mlen + SPX_N);
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     }
     /* Otherwise first fill a block, so that finalize only uses the message */
     else {
         memcpy(buf + SPX_N, m, SPX_SHA256_BLOCK_BYTES - SPX_N);
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+        SHA256_Update(&sha2ctx, buf, 64);
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_blocks(state, buf, 1);
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 
         m += SPX_SHA256_BLOCK_BYTES - SPX_N;
         mlen -= SPX_SHA256_BLOCK_BYTES - SPX_N;
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
+        SHA256_Update(&sha2ctx, m, mlen);
+        SHA256_Final(buf + SPX_SHA256_BLOCK_BYTES, &sha2ctx);
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_finalize(buf + SPX_SHA256_BLOCK_BYTES, state, m, mlen);
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     }
 
     for (i = 0; i < SPX_N; i++) {
@@ -91,7 +119,7 @@ void gen_message_random(unsigned char *R, const unsigned char *sk_prf,
     sha256(buf, buf, SPX_SHA256_BLOCK_BYTES + SPX_SHA256_OUTPUT_BYTES);
     memcpy(R, buf, SPX_N);
 }
-#endif
+#endif // #ifndef BUILD_SLIM_VERIFIER
 
 /**
  * Computes the message hash using R, the public key, and the message.
@@ -120,14 +148,14 @@ void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
 
     unsigned char buf[SPX_DGST_BYTES];
     unsigned char *bufp = buf;
-
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
     SHA256_CTX sha2ctx;
     SHA256_Init(&sha2ctx);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
     uint8_t state[40];
     sha256_inc_init(state);
-#endif 
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 
     memcpy(inbuf, R, SPX_N);
     memcpy(inbuf + SPX_N, pk, SPX_PK_BYTES);
@@ -135,31 +163,34 @@ void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
     /* If R + pk + message cannot fill up an entire block */
     if (SPX_N + SPX_PK_BYTES + mlen < SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES) {
         memcpy(inbuf + SPX_N + SPX_PK_BYTES, m, mlen);
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
         SHA256_Update(&sha2ctx, inbuf, SPX_N + SPX_PK_BYTES + mlen);
         SHA256_Final(seed, &sha2ctx);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_finalize(seed, state, inbuf, SPX_N + SPX_PK_BYTES + mlen);
-#endif 
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     }
     /* Otherwise first fill a block, so that finalize only uses the message */
     else {
         memcpy(inbuf + SPX_N + SPX_PK_BYTES, m,
                SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES);
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
         SHA256_Update(&sha2ctx, inbuf, 64*SPX_INBLOCKS);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_blocks(state, inbuf, SPX_INBLOCKS);
-#endif 
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
 
         m += SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
         mlen -= SPX_INBLOCKS * SPX_SHA256_BLOCK_BYTES - SPX_N - SPX_PK_BYTES;
-#ifdef BUILD_SLIM_VERIFIER // Call the OpenSSL style SHA256 to slim down client 
+#if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256) /* If using 
+a SHA256 implementation with the OpenSSL API */
         SHA256_Update(&sha2ctx, m, mlen);
         SHA256_Final(seed, &sha2ctx);
-#else // Or if code size is not a concern use the old SPHINCS+ 
+#else // Or if using a SHA256 implementation from crypto_hash/sha512/ref/
         sha256_inc_finalize(seed, state, m, mlen);
-#endif 
+#endif // #if defined(USE_OPENSSL_SHA256) || defined(USE_OPENSSL_API_SHA256)
     }
 
     /* By doing this in two steps, we prevent hashing the message twice;

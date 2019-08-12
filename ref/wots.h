@@ -24,7 +24,7 @@ void wots_gen_pk(unsigned char *pk, const unsigned char *seed,
 void wots_sign(unsigned char *sig, const unsigned char *msg,
                const unsigned char *seed, const unsigned char *pub_seed,
                uint32_t addr[8]);
-#endif
+#endif // #ifndef BUILD_SLIM_VERIFIER
 
 /**
  * Takes a WOTS signature and an n-byte message, computes a WOTS public key.

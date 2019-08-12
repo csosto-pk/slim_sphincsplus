@@ -9,9 +9,11 @@ void initialize_hash_function(const unsigned char *pub_seed,
 void prf_addr(unsigned char *out, const unsigned char *key,
               const uint32_t addr[8]);
 
+#ifndef BUILD_SLIM_VERIFIER // Don't use in verifier to keep it slim  
 void gen_message_random(unsigned char *R, const unsigned char *sk_seed,
                         const unsigned char *optrand,
                         const unsigned char *m, unsigned long long mlen);
+#endif
 
 void hash_message(unsigned char *digest, uint64_t *tree, uint32_t *leaf_idx,
                   const unsigned char *R, const unsigned char *pk,

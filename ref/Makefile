@@ -8,17 +8,17 @@ TESTS = test/wots \
 	test/fors \
 	test/spx \
 
-.PHONY: clean test benchmark sig-ver test/spx_slim-ver-from-file.exec test/spx_sig-to-file.exec
+.PHONY: clean test benchmark test/benchmark.exec2 sig-ver test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec test/spx_ver-from-file.exec test/spx_bloated-ver-from-file.exec 
 
 default: benchmark
 
-all: tests benchmarks 
+all: test benchmark 
 
 tests: $(TESTS)
 
 test: $(TESTS:=.exec)
 
-benchmark: test/benchmark.exec 
+benchmark: test/benchmark.exec2
 
 test/%: test/%.c $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) $< $(LDLIBS)
@@ -44,18 +44,18 @@ test/spx_slim-ver-from-file: test/spx_slim-ver-from-file.c $(SOURCES) $(HEADERS)
 test/spx_slim-ver-from-file.exec: test/spx_slim-ver-from-file
 	@$< ${SIG_FILES} 
 
-test/sig-ver: test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec 
+sig-ver: test/spx_sig-to-file.exec test/spx_slim-ver-from-file.exec 
+
+test/spx_ver-from-file: test/spx_slim-ver-from-file.c $(SOURCES) $(HEADERS)
+	$(CC) $(CFLAGS) -DBUILD_SLIM_VERIFIER -DUSE_OPENSSL_API_SHA256 -o test/spx_ver-from-file $(SOURCES) $< $(LDLIBS) 
+
+test/spx_ver-from-file.exec: test/spx_ver-from-file
+	@$< ${SIG_FILES} 
 
 test/spx_bloated-ver-from-file: test/spx_slim-ver-from-file.c $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) -o test/spx_bloated-ver-from-file $(SOURCES) $< $(LDLIBS) 
 
 test/spx_bloated-ver-from-file.exec: test/spx_bloated-ver-from-file 
-	@$< ${SIG_FILES} 
-
-test/spx_ver-from-file: test/spx_slim-ver-from-file.c $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) -DBUILD_SLIM_VERIFIER -o test/spx_ver-from-file $(SOURCES) $< $(LDLIBS) 
-
-test/spx_ver-from-file.exec: test/spx_ver-from-file
 	@$< ${SIG_FILES} 
 
 clean:
