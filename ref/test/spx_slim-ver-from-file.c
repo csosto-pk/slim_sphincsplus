@@ -15,7 +15,7 @@
 #define PRINT_STACK_SIZE_USED // If you also want to print the stack used. 
 
 #ifdef PRINT_STACK_SIZE_USED
-#define BIGGEST_STACK_SIZE_EXPECTED 10000
+#define BIGGEST_STACK_SIZE_EXPECTED 20000
 void clear_stack() {
     volatile unsigned char x[BIGGEST_STACK_SIZE_EXPECTED];
     int i;
@@ -25,7 +25,7 @@ void clear_stack() {
 }
 
 int get_stack() {
-    volatile unsigned char x[10000];
+    volatile unsigned char x[BIGGEST_STACK_SIZE_EXPECTED];
     int i;
     for (i=0; i<BIGGEST_STACK_SIZE_EXPECTED; i++) {
         if (x[i] != 0xfa) break;
