@@ -30,7 +30,7 @@ test/benchmark.exec2: test/benchmarkwopenssl
 	@$<
 
 test/benchmarkwopenssl: test/benchmark.c $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $(SOURCES) -DUSE_OPENSSL_SHA256 -lcrypto $< $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $(SOURCES) -DUSE_OPENSSL_SHA256 -lcrypto -lm $< $(LDLIBS)
 
 SIG_FILES = test/spx_msg~ test/spx_pk~ test/spx_sig~ 
 

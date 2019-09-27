@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include "../api.h"
 #include "../fors.h"
@@ -26,6 +27,24 @@ static unsigned long long median(unsigned long long *l, size_t llen)
 
   if(llen%2) return l[llen/2];
   else return (l[llen/2-1]+l[llen/2])/2;
+}
+
+static unsigned long long mean(unsigned long long *l, size_t llen)
+{
+  unsigned long long m = 0;
+  
+  for(size_t i=0; i<llen; i++)
+    m += l[i]/llen;
+  return m;
+}
+
+static unsigned long long stdv(unsigned long long *l, size_t llen, unsigned long long mn)
+{
+  unsigned long long var = 0;
+
+  for(size_t i=0; i<llen; i++)
+    var += pow(l[i]-mn,2)/llen;
+  return sqrt(var);
 }
 
 static void delta(unsigned long long *l, size_t llen)
@@ -73,16 +92,22 @@ static void printfalignedcomma (unsigned long long n, int len)
 
 static void display_result(double result, unsigned long long *l, size_t llen, unsigned long long mul)
 {
-    unsigned long long med;
+    unsigned long long med, mn, s;
 
     result /= NTESTS;
     delta(l, NTESTS + 1);
     med = median(l, llen);
-    printf("avg. %11.2lf us (%2.2lf sec); median ", result, result / 1e6);
-    printfalignedcomma(med, 12);
-    printf(" cycles,  %5llux: ", mul);
-    printfalignedcomma(mul*med, 12);
-    printf(" cycles\n");
+    mn = mean(l, llen);
+    s = stdv(l, llen, mn);
+    printf("avg: %11.2lf us (%2.2lf sec); median: ", result, result / 1e6);
+    printfalignedcomma(med, 3);
+    printf(" cycles, mean: ");
+    printfalignedcomma(mn, 3);
+    //printf(" cycles,  %5llux: ", mul);
+    //printfalignedcomma(mul*med, 12);
+    printf(" cycles, std: ");
+    printfalignedcomma(s, 3);
+    printf(" cycles. \n");
 }
 
 #define MEASURE(TEXT, MUL, FNCALL)\
@@ -108,14 +133,14 @@ int main()
     unsigned char *sm = malloc(SPX_BYTES + SPX_MLEN);
     unsigned char *mout = malloc(SPX_BYTES + SPX_MLEN);
 
-    unsigned char fors_pk[SPX_FORS_PK_BYTES];
-    unsigned char fors_m[SPX_FORS_MSG_BYTES];
-    unsigned char fors_sig[SPX_FORS_BYTES];
+    //unsigned char fors_pk[SPX_FORS_PK_BYTES];
+    //unsigned char fors_m[SPX_FORS_MSG_BYTES];
+    //unsigned char fors_sig[SPX_FORS_BYTES];
     unsigned char addr[SPX_ADDR_BYTES];
 
-    unsigned char wots_sig[SPX_WOTS_BYTES];
-    unsigned char wots_m[SPX_N];
-    unsigned char wots_pk[SPX_WOTS_PK_BYTES];
+    //unsigned char wots_sig[SPX_WOTS_BYTES];
+    //unsigned char wots_m[SPX_N];
+    //unsigned char wots_pk[SPX_WOTS_PK_BYTES];
 
     unsigned long long smlen;
     unsigned long long mlen;
@@ -134,16 +159,16 @@ int main()
     printf("Running %d iterations.\n", NTESTS);
 
     MEASURE("Generating keypair.. ", 1, crypto_sign_keypair(pk, sk));
-    MEASURE("  - WOTS pk gen..    ", (1 << SPX_TREE_HEIGHT), wots_gen_pk(wots_pk, sk, pk, (uint32_t *) addr));
+    //MEASURE("  - WOTS pk gen..    ", (1 << SPX_TREE_HEIGHT), wots_gen_pk(wots_pk, sk, pk, (uint32_t *) addr));
     MEASURE("Signing..            ", 1, crypto_sign(sm, &smlen, m, SPX_MLEN, sk));
-    MEASURE("  - FORS signing..   ", 1, fors_sign(fors_sig, fors_pk, fors_m, sk, pk, (uint32_t *) addr));
-    MEASURE("  - WOTS signing..   ", SPX_D, wots_sign(wots_sig, wots_m, sk, pk, (uint32_t *) addr));
-    MEASURE("  - WOTS pk gen..    ", SPX_D * (1 << SPX_TREE_HEIGHT), wots_gen_pk(wots_pk, sk, pk, (uint32_t *) addr));
+    //MEASURE("  - FORS signing..   ", 1, fors_sign(fors_sig, fors_pk, fors_m, sk, pk, (uint32_t *) addr));
+    //MEASURE("  - WOTS signing..   ", SPX_D, wots_sign(wots_sig, wots_m, sk, pk, (uint32_t *) addr));
+    //MEASURE("  - WOTS pk gen..    ", SPX_D * (1 << SPX_TREE_HEIGHT), wots_gen_pk(wots_pk, sk, pk, (uint32_t *) addr));
     MEASURE("Verifying..          ", 1, crypto_sign_open(mout, &mlen, sm, smlen, pk));
 
     printf("Signature size: %d (%.2f KiB)\n", SPX_BYTES, SPX_BYTES / 1024.0);
     printf("Public key size: %d (%.2f KiB)\n", SPX_PK_BYTES, SPX_PK_BYTES / 1024.0);
-    printf("Secret key size: %d (%.2f KiB)\n", SPX_SK_BYTES, SPX_SK_BYTES / 1024.0);
+    //printf("Secret key size: %d (%.2f KiB)\n", SPX_SK_BYTES, SPX_SK_BYTES / 1024.0);
 
     free(m);
     free(sm);
