@@ -105,7 +105,7 @@ static void display_result(double result, unsigned long long *l, size_t llen, un
     printfalignedcomma(mn, 3);
     //printf(" cycles,  %5llux: ", mul);
     //printfalignedcomma(mul*med, 12);
-    printf(" cycles, std: ");
+    printf(" cycles, stdv: ");
     printfalignedcomma(s, 3);
     printf(" cycles. \n");
 }
