@@ -41,9 +41,13 @@ static unsigned long long mean(unsigned long long *l, size_t llen)
 static unsigned long long stdv(unsigned long long *l, size_t llen, unsigned long long mn)
 {
   unsigned long long var = 0;
+  unsigned long long tmp;
 
-  for(size_t i=0; i<llen; i++)
-    var += pow(l[i]-mn,2)/llen;
+  for(int i=0; i<llen; i++) {
+    if (l[i]>mn) tmp=l[i]-mn; 
+    else tmp=mn-l[i];
+    var += pow(tmp,2)/llen; 
+  }
   return sqrt(var);
 }
 
