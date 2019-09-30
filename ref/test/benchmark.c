@@ -43,7 +43,7 @@ static unsigned long long stdv(unsigned long long *l, size_t llen, unsigned long
   unsigned long long var = 0;
   unsigned long long tmp;
 
-  for(int i=0; i<llen; i++) {
+  for(size_t i=0; i<llen; i++) {
     if (l[i]>mn) tmp=l[i]-mn; 
     else tmp=mn-l[i];
     var += pow(tmp,2)/llen; 
@@ -100,16 +100,18 @@ static void display_result(double result, unsigned long long *l, size_t llen, un
 
     result /= NTESTS;
     delta(l, NTESTS + 1);
+    med = mul; //Just to supress a compiler warning. 
     med = median(l, llen);
     mn = mean(l, llen);
     s = stdv(l, llen, mn);
-    printf("avg: %11.2lf us (%2.2lf sec); median: ", result, result / 1e6);
+    //printf("avg: %11.2lf us (%2.2lf sec); median: ", result, result / 1e6);
+    printf("avg: %5.3lf ms; median: ", result / 1e3);
     printfalignedcomma(med, 3);
-    printf(" cycles, mean: ");
+    printf(", mean: ");
     printfalignedcomma(mn, 3);
     //printf(" cycles,  %5llux: ", mul);
     //printfalignedcomma(mul*med, 12);
-    printf(" cycles, stdv: ");
+    printf(", stdv: ");
     printfalignedcomma(s, 3);
     printf(" cycles. \n");
 }
