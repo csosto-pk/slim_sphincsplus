@@ -20,6 +20,7 @@ void clear_stack() {
     volatile unsigned char x[BIGGEST_STACK_SIZE_EXPECTED];
     int i;
     for (i=0; i<BIGGEST_STACK_SIZE_EXPECTED; i++) x[i]=0xfa;
+    if (x[0]!=0) return; // Just to supprer compiler warning
     //memset((void*) x, 0xfa, sizeof x ); // Instead of the for loop above, but was not working
     //printf("Stack-%x-%x-%x\n",x[0],x[10000],x[19999]); //Only for troubleshooting
 }
