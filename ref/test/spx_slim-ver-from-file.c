@@ -8,18 +8,18 @@
 #define MAX_MSG_SIZE 32 // We only sign 256-bit hashes for image signing 
 #define MAX_PK_SIZE 64 /* SPHINCS+ PK size for SPHINCS+ image 
 			signing parameters can be 48 or 64 bytes. */
-#define MAX_SIG_SIZE 20000 /* SPHINCS+ Signature size for SPHINCS+
+#define MAX_SIG_SIZE 25000 /* SPHINCS+ Signature size for SPHINCS+
 			image signing parameters can't be > 25KB */
 //#define TEST_MSG_RECOVERY // Only if we want to check the recovered 
 			// is the same as the one stored in the file.
-//#define PRINT_STACK_SIZE_USED // If you also want to print the stack used. 
+#define PRINT_STACK_SIZE_USED // If you also want to print the stack used. 
 
 #ifdef PRINT_STACK_SIZE_USED
 #define BIGGEST_STACK_SIZE_EXPECTED 20000
 void clear_stack() {
     volatile unsigned char x[BIGGEST_STACK_SIZE_EXPECTED];
     int i;
-    for (i=0; i<BIGGEST_STACK_SIZE_EXPECTED; i++) x[i]=0xfa;
+    for (i=0; i<BIGGEST_STACK_SIZE_EXPECTED; i++) x[i]=0xff;
     if (x[0]!=0) return; // Just to supprer compiler warning
     //memset((void*) x, 0xfa, sizeof x ); // Instead of the for loop above, but was not working
     //printf("Stack-%x-%x-%x\n",x[0],x[10000],x[19999]); //Only for troubleshooting
@@ -29,7 +29,7 @@ int get_stack() {
     volatile unsigned char x[BIGGEST_STACK_SIZE_EXPECTED];
     int i;
     for (i=0; i<BIGGEST_STACK_SIZE_EXPECTED; i++) {
-        if (x[i] != 0xfa) break;
+        if (x[i] != 0xff) break;
     }
     return BIGGEST_STACK_SIZE_EXPECTED-i;
 }
