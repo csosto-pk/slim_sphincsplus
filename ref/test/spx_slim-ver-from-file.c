@@ -12,7 +12,7 @@
 			image signing parameters can't be > 25KB */
 //#define TEST_MSG_RECOVERY // Only if we want to check the recovered 
 			// is the same as the one stored in the file.
-#define PRINT_STACK_SIZE_USED // If you also want to print the stack used. 
+//#define PRINT_STACK_SIZE_USED // If you also want to print the stack used. 
 
 #ifdef PRINT_STACK_SIZE_USED
 #define BIGGEST_STACK_SIZE_EXPECTED 20000

@@ -1,1 +1,1 @@
-params/params-sphincs-sha256-192-h15-w16.h
+params/params-sphincs-sha256-256-h35-w256.h
