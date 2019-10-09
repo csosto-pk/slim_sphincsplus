@@ -12,7 +12,7 @@
 #include "../randombytes.h"
 
 #define SPX_MLEN 32
-#define NTESTS 1000
+#define NTESTS 10
 
 static int cmp_llu(const void *a, const void*b)
 {
